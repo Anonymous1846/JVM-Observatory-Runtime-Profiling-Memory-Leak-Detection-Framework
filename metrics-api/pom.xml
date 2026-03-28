@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.jvmobservatory</groupId>
+        <artifactId>jvm-observatory</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>metrics-api</artifactId>
+    <description>
+        Spring Boot REST API that exposes JVM telemetry metrics.
+        Consumes events from Kafka via spring-kafka and serves them through
+        REST endpoints for the React dashboard.
+    </description>
+
+    <dependencies>
+        <!-- Spring Boot web starter: embedded Tomcat + Spring MVC -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Actuator: health checks and metrics endpoints for production monitoring -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Spring Kafka: declarative @KafkaListener support -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <!-- Internal modules -->
+        <dependency>
+            <groupId>com.jvmobservatory</groupId>
+            <artifactId>allocation-tracker</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jvmobservatory</groupId>
+            <artifactId>heap-analyzer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jvmobservatory</groupId>
+            <artifactId>gc-monitor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jvmobservatory</groupId>
+            <artifactId>telemetry-pipeline</artifactId>
+        </dependency>
+
+        <!-- Jackson Java 8 date/time support for proper Instant serialization -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Repackages the JAR as an executable fat JAR with embedded Tomcat.
+                 This allows deployment with a simple "java -jar metrics-api.jar". -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

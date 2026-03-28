@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.jvmobservatory</groupId>
+        <artifactId>jvm-observatory</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>telemetry-pipeline</artifactId>
+    <description>
+        Kafka-based telemetry pipeline for streaming JVM profiling events.
+        Produces allocation samples, GC events, and leak alerts to Kafka topics,
+        and consumes them back into an in-memory aggregator for the REST API.
+    </description>
+
+    <dependencies>
+        <!-- Internal modules: allocation tracking data and GC monitoring data -->
+        <dependency>
+            <groupId>com.jvmobservatory</groupId>
+            <artifactId>allocation-tracker</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jvmobservatory</groupId>
+            <artifactId>gc-monitor</artifactId>
+        </dependency>
+
+        <!-- Kafka client for producing and consuming telemetry events -->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+        </dependency>
+
+        <!-- Jackson for JSON serialization of telemetry events -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <!-- JavaTimeModule: required to serialize java.time types (Instant, LocalDateTime) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
+        <!-- Logging facade — implementation provided at runtime by the deploying application -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

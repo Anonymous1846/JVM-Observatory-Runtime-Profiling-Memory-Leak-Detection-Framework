@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(java|cpp|h\\)$\")",
+      "Read(//c/Program Files/CMake/bin/**)",
+      "Read(//c/Program Files/Microsoft Visual Studio/**)",
+      "Bash(where cmake:*)",
+      "Read(//c/Program Files \\(x86\\)/Microsoft Visual Studio/**)",
+      "Bash(find '/c/Program Files \\(x86\\)/Microsoft Visual Studio' -name dumpbin.exe -maxdepth 8)",
+      "Bash(find '/c/Program Files \\(x86\\)' -name cl.exe -maxdepth 8)",
+      "Bash(ls \"/c/Program Files \\(x86\\)/Microsoft Visual Studio/\")",
+      "Bash(export PATH=\"/c/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64:$PATH\")",
+      "Bash(dumpbin)",
+      "Bash(grep -E \"src/test/java|src/test$\")",
+      "Bash(ls \"C:/Users/alpha/OneDrive/Documents/Projects/JVMTI/analysis-service\"/*.py)",
+      "Bash(pip install:*)",
+      "Bash(npm install:*)",
+      "Bash(npx vitest:*)",
+      "Bash(python -m pytest test_heap_anomaly_detector.py test_leak_ranker.py -v)",
+      "Bash(python -m pytest test_heap_anomaly_detector.py::TestHeapAnomalyDetector::test_spike_triggers_alert -v)",
+      "Bash(find C:/Users/alpha/OneDrive/Documents/Projects/JVMTI/demo-app -type f -name *.java)"
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.jvmobservatory</groupId>
+        <artifactId>jvm-observatory</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>allocation-tracker</artifactId>
+
+    <name>JVM Observatory :: Allocation Tracker</name>
+    <description>
+        Lock-free, high-throughput allocation counting engine. Tracks per-class allocation
+        counts, byte totals, and hot allocation sites using striped counters (LongAdder)
+        for minimal contention under heavy concurrent recording.
+    </description>
+
+    <dependencies>
+        <!-- WHY slf4j-api only (no implementation): this is a library module.
+             The application that depends on us (e.g., java-agent or metrics-api)
+             provides the concrete logging backend (Logback, slf4j-simple, etc.). -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- WHY JUnit Jupiter: modern parameterized tests, nested test classes,
+             and extension model. Version managed by parent POM. -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

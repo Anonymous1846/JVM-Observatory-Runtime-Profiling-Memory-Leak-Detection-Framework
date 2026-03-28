@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.jvmobservatory</groupId>
+    <artifactId>jvm-observatory</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>JVM Observatory</name>
+    <description>
+        A comprehensive JVM monitoring and analysis platform that combines JVMTI native agents,
+        ByteBuddy instrumentation, and heap analysis to provide deep visibility into JVM internals.
+    </description>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Modules: only the 7 Java modules are built by Maven.
+         native-agent (C/C++ via CMake), analysis-service, and visualization
+         are built separately and intentionally excluded from the reactor.
+         ═══════════════════════════════════════════════════════════════════ -->
+    <modules>
+        <module>java-agent</module>
+        <module>allocation-tracker</module>
+        <module>heap-analyzer</module>
+        <module>gc-monitor</module>
+        <module>telemetry-pipeline</module>
+        <module>metrics-api</module>
+        <module>demo-app</module>
+    </modules>
+
+    <properties>
+        <!-- WHY UTF-8: ensures consistent encoding across all platforms (Windows, Linux, macOS)
+             so that source files with non-ASCII characters compile identically everywhere. -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- WHY Java 17: LTS release with records, sealed classes, pattern matching for instanceof,
+             and text blocks. We set source/target 17 even though we compile on JDK 22 so that
+             the bytecode runs on any JVM >= 17. -->
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+
+        <!-- Framework and library versions pinned here so all modules share
+             the same dependency versions, preventing classpath conflicts. -->
+        <spring.boot.version>3.2.4</spring.boot.version>
+        <bytebuddy.version>1.14.12</bytebuddy.version>
+        <kafka.version>3.7.0</kafka.version>
+        <jackson.version>2.17.0</jackson.version>
+        <slf4j.version>2.0.12</slf4j.version>
+        <junit.version>5.10.2</junit.version>
+    </properties>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         dependencyManagement: declares versions centrally so child modules
+         can depend on these artifacts WITHOUT specifying a version.
+         WHY BOM import: Spring Boot's BOM transitively manages hundreds of
+         dependencies (Tomcat, Jackson, Logback, etc.) so we don't have to.
+         ═══════════════════════════════════════════════════════════════════ -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Boot BOM — manages transitive dependency versions -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- ── Internal modules ────────────────────────────────────── -->
+            <dependency>
+                <groupId>com.jvmobservatory</groupId>
+                <artifactId>java-agent</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jvmobservatory</groupId>
+                <artifactId>allocation-tracker</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jvmobservatory</groupId>
+                <artifactId>heap-analyzer</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jvmobservatory</groupId>
+                <artifactId>gc-monitor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jvmobservatory</groupId>
+                <artifactId>telemetry-pipeline</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jvmobservatory</groupId>
+                <artifactId>metrics-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jvmobservatory</groupId>
+                <artifactId>demo-app</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- ── ByteBuddy: runtime bytecode generation ──────────────── -->
+            <!-- WHY ByteBuddy: it's the only bytecode library that handles
+                 Java 17+ sealed classes and hidden classes correctly.
+                 ASM is lower-level; Javassist doesn't support modern JVM features. -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${bytebuddy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${bytebuddy.version}</version>
+            </dependency>
+
+            <!-- ── Kafka: telemetry event transport ────────────────────── -->
+            <!-- WHY Kafka (not RabbitMQ/gRPC): durable, partitioned log that
+                 decouples producers from consumers and supports replay.
+                 Critical for telemetry where dropping events is unacceptable. -->
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka.version}</version>
+            </dependency>
+
+            <!-- ── Jackson: JSON serialization ─────────────────────────── -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <!-- ── Logging ─────────────────────────────────────────────── -->
+            <!-- WHY SLF4J: facade pattern lets us swap implementations
+                 (Logback in production, slf4j-simple in tests) without
+                 changing any application code. -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
+            <!-- ── Testing ─────────────────────────────────────────────── -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <!-- WHY explicit compiler plugin: ensures all modules use the same
+                 Java version regardless of the developer's JAVA_HOME. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.12.1</version>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                </configuration>
+            </plugin>
+
+            <!-- WHY surefire: runs JUnit 5 tests during 'mvn test' phase.
+                 Version 3.2.5 has native JUnit Platform support (no provider dependency needed). -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>

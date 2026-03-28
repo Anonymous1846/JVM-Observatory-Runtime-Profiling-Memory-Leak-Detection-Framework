@@ -1,0 +1,35 @@
+# JVM Observatory Metrics API — Spring Boot configuration
+#
+# Environment variable overrides:
+#   KAFKA_SERVERS  — Kafka bootstrap servers (default: localhost:9092)
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: jvm-observatory-api
+
+  kafka:
+    # Use KAFKA_SERVERS env var in production; fall back to localhost for dev
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
+    consumer:
+      group-id: metrics-api-group
+      # Start from latest offset so we don't replay stale historical data on first start
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+  jackson:
+    serialization:
+      # Serialize Instant/LocalDateTime as ISO-8601 strings, not numeric timestamps.
+      # This makes the JSON human-readable and easier to parse in the React frontend.
+      write-dates-as-timestamps: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # Expose health and metrics endpoints for production monitoring (e.g., Prometheus scraping).
+        # Keep the set minimal to avoid leaking internal details.
+        include: health,metrics

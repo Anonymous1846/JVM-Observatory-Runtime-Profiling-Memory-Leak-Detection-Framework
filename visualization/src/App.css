@@ -1,0 +1,194 @@
+/* ===== CSS Variables (color palette) ===== */
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --accent: #3b82f6;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --success: #22c55e;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --border: #334155;
+}
+
+/* ===== App Layout ===== */
+.app {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ===== Header Bar ===== */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.app-id-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-id-input label {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.app-id-input input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  width: 260px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.app-id-input input:focus {
+  border-color: var(--accent);
+}
+
+/* ===== Dashboard Grid (2x2 for charts, full-width for tables) ===== */
+.dashboard {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  padding: 1.5rem 2rem;
+}
+
+/* ===== Card Styling ===== */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  overflow: hidden;
+}
+
+.card h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Full-width cards span both columns */
+.card.full-width {
+  grid-column: 1 / -1;
+}
+
+/* ===== Placeholder for empty data ===== */
+.placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+/* ===== Leak Suspect Table ===== */
+.leak-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.leak-table th {
+  text-align: left;
+  padding: 0.625rem 0.75rem;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.leak-table td {
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.leak-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Class name in monospace for readability */
+.class-name {
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.8125rem;
+}
+
+/* ===== Progress Bar (leak probability) ===== */
+.prob-bar-container {
+  width: 100%;
+  height: 8px;
+  background: var(--bg);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.prob-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* ===== Severity Badge ===== */
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge.high {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+}
+
+.badge.medium {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warning);
+}
+
+.badge.low {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+}
+
+/* ===== Treemap / Flamegraph Container ===== */
+.flamegraph-container {
+  width: 100%;
+  min-height: 300px;
+}
+
+/* ===== Responsive: stack to 1 column on mobile ===== */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .dashboard {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .app-id-input input {
+    width: 100%;
+  }
+}

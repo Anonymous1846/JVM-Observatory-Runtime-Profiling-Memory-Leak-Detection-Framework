@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Premain-Class: com.jvmobservatory.agent.LeakAgent
+Agent-Class: com.jvmobservatory.agent.LeakAgent
+Can-Retransform-Classes: true
+Can-Redefine-Classes: true

@@ -1,0 +1,42 @@
+; jvm_observatory_agent.def — Windows Module Definition File
+; ─────────────────────────────────────────────────────────────────────────────
+; This file tells the Windows linker which symbols to EXPORT from the DLL.
+;
+; WHY IS THIS FILE NECESSARY?
+;   On Windows, DLL symbols are hidden by default. A symbol only appears in
+;   the DLL's export table if:
+;     (a) It has __declspec(dllexport) in the source (JNIEXPORT macro), OR
+;     (b) It is listed in a .def file.
+;   We use both: JNIEXPORT in the source code, and this .def file. This is
+;   "belt-and-suspenders" — if one mechanism fails (e.g., JNIEXPORT is
+;   accidentally removed), the other still exports the symbol.
+;
+; HOW THE JVM FINDS THESE SYMBOLS:
+;   Agent_OnLoad    — JVM calls this immediately after loading the DLL via
+;                     -agentpath:. It searches the export table by exact name.
+;   Agent_OnUnload  — JVM calls this during shutdown. Also searched by name.
+;   Java_com_jvmobservatory_agent_NativeEventBridge_drainEvents
+;                   — JNI function. JVM derives the name from the Java method:
+;                     package com.jvmobservatory.agent   → com_jvmobservatory_agent
+;                     class   NativeEventBridge          → NativeEventBridge
+;                     method  drainEvents                → drainEvents
+;                     prefix  Java_                      → Java_
+;                     result: Java_com_jvmobservatory_agent_NativeEventBridge_drainEvents
+;
+; VERIFY AFTER BUILD:
+;   dumpbin /exports build\Release\jvm_observatory_agent.dll
+;   All three symbols below must appear in the output.
+;
+; SYNTAX NOTES:
+;   - Lines starting with ; are comments (ignored by the linker).
+;   - LIBRARY must match the DLL filename (without .dll extension).
+;   - Each name under EXPORTS must exactly match the C++ function name
+;     (which uses extern "C" to prevent C++ name mangling).
+; ─────────────────────────────────────────────────────────────────────────────
+
+LIBRARY jvm_observatory_agent
+
+EXPORTS
+    Agent_OnLoad
+    Agent_OnUnload
+    Java_com_jvmobservatory_agent_NativeEventBridge_drainEvents
